@@ -1,0 +1,29 @@
+trial1<-read.csv("/Users/rae/Downloads/Nutrient Petri Dish Germination - Trial 01.csv") 
+trial2<-read.csv("/Users/rae/Downloads/Nutrient Petri Dish Germination - Trial 02.csv")
+trial3<-read.csv("/Users/rae/Downloads/Nutrient Petri Dish Germination - Trial 03.csv")
+
+combo<-rbind(trial1, trial2, trial3)
+
+
+#calculate standard error
+
+nutrient_summary2<- trial2 %>%
+  group_by(Treatment) %>%
+  summarize(mean_total_germ= mean(germinated_total, na.rm = TRUE),sd_germinated_total= sd(germinated_total, na.rm = TRUE),
+            n = n(), se_germinated_total= sd_germinated_total / sqrt(n))
+
+#re-order the x-axis
+nutrient_summary2$Treatment <- as.character(nutrient_summary2$Treatment)
+nutrient_summary2$Treatment <- factor(nutrient_summary2$Treatment, levels=c("100 N", "50 N", "25 N", "Sump ","NaCl", "DI ", "Tap"))
+
+ggplot(nutrient_summary2, aes(x=Treatment, y = mean_total_germ))+
+  geom_bar(stat = "identity", fill="rosybrown3", colour="black") + 
+  ylab("Mean Germinated Seeds")+
+  theme(axis.text = element_text(size = 14)) + 
+  theme(axis.title = element_text(size = 16)) +
+  theme_classic()+
+  xlab("Water Treatment")+ 
+  geom_errorbar(aes(ymin=mean_total_germ-se_germinated_total, ymax=mean_total_germ+se_germinated_total), width= .2)+
+  ggtitle("Trial 2")+
+  theme(plot.title = element_text(hjust = 0.5))+
+  geom_text(label = c("a", "a", "a","a", "a","a","a"), aes(y = c(98,98, 98, 96, 97, 98,95), x = Treatment), size = 4)
